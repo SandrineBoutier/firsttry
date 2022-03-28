@@ -1,4 +1,7 @@
-import { Version } from '@microsoft/sp-core-library';
+import {
+  Environment,
+  EnvironmentType
+} from '@microsoft/sp-core-library';
 import {
   IPropertyPaneConfiguration,
   PropertyPaneTextField,
@@ -12,6 +15,12 @@ import { escape } from '@microsoft/sp-lodash-subset';
 
 import styles from './HelloWorldWebPart.module.scss';
 import * as strings from 'HelloWorldWebPartStrings';
+import MockHttpClient from './MockHttpClient';
+import {
+  SPHttpClient,
+  SPHttpClientResponse
+} from '@microsoft/sp-http';
+
 
 export interface IHelloWorldWebPartProps {
   description: string;
@@ -19,6 +28,15 @@ export interface IHelloWorldWebPartProps {
   test1: boolean;
   test2: string;
   test3: boolean;
+}
+
+export interface ISPLists {
+  value: ISPList[];
+}
+
+export interface ISPList {
+  Title: string;
+  Id: string;
 }
 
 export default class HelloWorldWebPart extends BaseClientSideWebPart<IHelloWorldWebPartProps> {
@@ -48,8 +66,11 @@ export default class HelloWorldWebPart extends BaseClientSideWebPart<IHelloWorld
             </a>
           </div>
         </div>
+        <div id="spListContainer" />
       </div>
     </div>`;
+  
+  this._renderListAsync();
   }
 
   private _getEnvironmentMessage(): string {
@@ -75,8 +96,46 @@ export default class HelloWorldWebPart extends BaseClientSideWebPart<IHelloWorld
 
   }
 
-  protected get dataVersion(): Version {
-    return Version.parse('1.0');
+  // protected get dataVersion(): Version {
+  //   return Version.parse('1.0');
+  // }
+
+  private _getMockListData(): Promise<ISPLists> {
+    return MockHttpClient.get()
+      .then((data: ISPList[]) => {
+        var listData: ISPLists = { value: data };
+        return listData;
+      }) as Promise<ISPLists>;
+  }
+
+  private _getListData(): Promise<ISPLists> {
+    return this.context.spHttpClient.get(this.context.pageContext.web.absoluteUrl + `/_api/web/lists?$filter=Hidden eq false`, SPHttpClient.configurations.v1)
+      .then((response: SPHttpClientResponse) => {
+        return response.json();
+      });
+  }
+
+  private _renderList(items: ISPList[]): void {
+    let html: string = '';
+    items.forEach((item: ISPList) => {
+      html += `
+    <ul class="${styles.list}">
+      <li class="${styles.listItem}">
+        <span class="ms-font-l">${item.Title}</span>
+      </li>
+    </ul>`;
+    });
+  
+    const listContainer: Element = this.domElement.querySelector('#spListContainer');
+    listContainer.innerHTML = html;
+  }
+
+  //utile?
+  private _renderListAsync(): void { 
+    this._getListData()
+      .then((response) => {
+        this._renderList(response.value);
+      });
   }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
