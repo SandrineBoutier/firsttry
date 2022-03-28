@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "firsttry-client-side-solution",
+    "id": "84c02770-8a18-49cb-9bcc-6c0c3e14fa39",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.14.0"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "firsttry description"
+      },
+      "longDescription": {
+        "default": "firsttry description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "firsttry Feature",
+        "description": "The feature that activates elements of the firsttry solution.",
+        "id": "b20dcac2-87de-4cb9-9499-0852b68d0111",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/firsttry.sppkg"
+  }
+}
